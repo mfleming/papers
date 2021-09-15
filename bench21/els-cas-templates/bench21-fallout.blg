@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: bench21-fallout.aux
+The style file: cas-model2-names.bst
+Database file #1: bench21-fallout.bib
+Warning--I'm ignoring CPD's extra "year" field
+--line 15 of file bench21-fallout.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+You've used 16 entries,
+            2990 wiz_defined-function locations,
+            830 strings with 8734 characters,
+and the built_in function-call counts, 8633 in all, are:
+= -- 653
+> -- 320
+< -- 12
++ -- 128
+- -- 108
+* -- 830
+:= -- 1316
+add.period$ -- 48
+call.type$ -- 16
+change.case$ -- 122
+chr.to.int$ -- 16
+cite$ -- 16
+duplicate$ -- 680
+empty$ -- 641
+format.name$ -- 140
+if$ -- 1597
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 123
+newline$ -- 95
+num.names$ -- 64
+pop$ -- 304
+preamble$ -- 1
+purify$ -- 100
+quote$ -- 0
+skip$ -- 207
+stack$ -- 0
+substring$ -- 271
+swap$ -- 399
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 138
+warning$ -- 0
+while$ -- 52
+width$ -- 0
+write$ -- 234
+(There was 1 warning)

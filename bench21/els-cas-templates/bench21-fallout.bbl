@@ -1,0 +1,128 @@
+\begin{thebibliography}{16}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Misc
+\bibitem[{{Adelphi}()}]{ADELPHI}
+\bibinfo{author}{{Adelphi}}, .
+\newblock \bibinfo{title}{Automation tool for testing cassandra oss}.
+\newblock \URLprefix \url{https://github.com/datastax/adelphi}.
+  \bibinfo{note}{accessed: 2021-08-05}.
+%Type = Misc
+\bibitem[{{Apache Cassandra}()}]{CASSANDRASTRESS}
+\bibinfo{author}{{Apache Cassandra}}, .
+\newblock \bibinfo{title}{Cassandra stress}.
+\newblock \URLprefix
+  \url{https://cassandra.apache.org/doc/latest/cassandra/tools/cassandra_stress.html}.
+  \bibinfo{note}{accessed: 2021-08-05}.
+%Type = Article
+\bibitem[{Boehm(1976)}]{Boehm}
+\bibinfo{author}{Boehm, B.}, \bibinfo{year}{1976}.
+\newblock \bibinfo{title}{Software engineering}.
+\newblock \bibinfo{journal}{IEEE Transactions on Computers}
+  \bibinfo{volume}{C-25}, \bibinfo{pages}{1226--1241}.
+%Type = Book
+\bibitem[{Brikman(2019)}]{TERRAFORM}
+\bibinfo{author}{Brikman, Y.}, \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{Terraform: Up \& Running: Writing Infrastructure as
+  Code}.
+\newblock \bibinfo{publisher}{O'Reilly Media}.
+%Type = Article
+\bibitem[{Cao et~al.(2020)Cao, Dong, Vemuri and Du}]{ROCKSDB}
+\bibinfo{author}{Cao, Z.}, \bibinfo{author}{Dong, S.}, \bibinfo{author}{Vemuri,
+  S.}, \bibinfo{author}{Du, D.H.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Characterizing, modeling, and benchmarking rocksdb
+  key-value workloads at facebook}.
+\newblock \bibinfo{journal}{18th USENIX Conference on File and Storage
+  Technologies (FAST 20)} , \bibinfo{pages}{209--223}.
+%Type = Article
+\bibitem[{Daly et~al.(2020)Daly, Brown, Ingo, O’Leary and Bradford.}]{CPD}
+\bibinfo{author}{Daly, D.}, \bibinfo{author}{Brown, W.}, \bibinfo{author}{Ingo,
+  H.}, \bibinfo{author}{O’Leary, J.}, \bibinfo{author}{Bradford., D.},
+  \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{The use of change point detection to identify
+  software performance regressions in a continuous integration system}.
+\newblock \bibinfo{journal}{In Proceedings of the 2020 ACM/SPEC International
+  Conference on Performance Engineering(ICPE ’20)}
+  \DOIprefix\doi{10.1145/3358960.3375791}.
+%Type = Article
+\bibitem[{Gupta et~al.(2011)Gupta, Vishwanath, McNett, Vahdat, Yocum, Snoeren
+  and Voelker}]{DIECAST}
+\bibinfo{author}{Gupta, D.}, \bibinfo{author}{Vishwanath, K.V.},
+  \bibinfo{author}{McNett, M.}, \bibinfo{author}{Vahdat, A.},
+  \bibinfo{author}{Yocum, K.}, \bibinfo{author}{Snoeren, A.},
+  \bibinfo{author}{Voelker, G.M.}, \bibinfo{year}{2011}.
+\newblock \bibinfo{title}{Diecast: Testing distributed systems with an accurate
+  scale model}.
+\newblock \bibinfo{journal}{ACM Transactions on Computer Systems (TOCS), 29(2)}
+  , \bibinfo{pages}{1--48}.
+%Type = Misc
+\bibitem[{{HdrHistogram}()}]{HDRHISTOGRAM}
+\bibinfo{author}{{HdrHistogram}}, .
+\newblock \bibinfo{title}{High dynamic range histogram}.
+\newblock \URLprefix \url{http://hdrhistogram.org/}. \bibinfo{note}{accessed:
+  2021-08-05}.
+%Type = Book
+\bibitem[{Humble and Farley(2010)}]{CONTINUOUS}
+\bibinfo{author}{Humble, J.}, \bibinfo{author}{Farley, D.},
+  \bibinfo{year}{2010}.
+\newblock \bibinfo{title}{Continuous Delivery: Reliable Software Releases
+  through Build, Test, and Deployment Automation}.
+\newblock \bibinfo{publisher}{Addison-Wesley}.
+%Type = Article
+\bibitem[{Ingo and Daly(2020)}]{DSI}
+\bibinfo{author}{Ingo, H.}, \bibinfo{author}{Daly, D.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Automated system performance testing at mongodb}.
+\newblock \bibinfo{journal}{In Workshop on Testing Database Systems
+  (DBTest’20)} \DOIprefix\doi{10.1145/3395032.3395323}.
+%Type = Misc
+\bibitem[{{Jinja}()}]{JINJA}
+\bibinfo{author}{{Jinja}}, .
+\newblock \bibinfo{title}{Template engine for python}.
+\newblock \URLprefix \url{https://palletsprojects.com/p/jinja/}.
+  \bibinfo{note}{accessed: 2021-08-04}.
+%Type = Misc
+\bibitem[{Kingsbury()}]{JEPSEN}
+\bibinfo{author}{Kingsbury, K.}, .
+\newblock \bibinfo{title}{Distributed systems safety research, jepsen}.
+\newblock \URLprefix \url{https://jepsen.io/}. \bibinfo{note}{accessed:
+  2021-07-29}.
+%Type = Misc
+\bibitem[{{Mustache}()}]{MUSTACHE}
+\bibinfo{author}{{Mustache}}, .
+\newblock \bibinfo{title}{Logic-less templates}.
+\newblock \URLprefix \url{https://mustache.github.io/}.
+  \bibinfo{note}{accessed: 2021-07-28}.
+%Type = Misc
+\bibitem[{{NoSQLBench}()}]{NOSQLBENCH}
+\bibinfo{author}{{NoSQLBench}}, .
+\newblock \bibinfo{title}{The open source nosql benchmarking suite}.
+\newblock \URLprefix \url{https://github.com/nosqlbench/nosqlbench}.
+  \bibinfo{note}{accessed: 2021-08-05}.
+%Type = Article
+\bibitem[{Rehmann et~al.(2016)Rehmann, Seo, Hwang, Truong, Böhm and Lee}]{SAP}
+\bibinfo{author}{Rehmann, K.T.}, \bibinfo{author}{Seo, C.},
+  \bibinfo{author}{Hwang, D.}, \bibinfo{author}{Truong, B.T.},
+  \bibinfo{author}{Böhm, A.}, \bibinfo{author}{Lee, D.H.},
+  \bibinfo{year}{2016}.
+\newblock \bibinfo{title}{Performance monitoring in sap hana's continuous
+  integration process}.
+\newblock \bibinfo{journal}{ACM SIGMETRICS Performance Evaluation Review. 43} ,
+  \bibinfo{pages}{43--52}\DOIprefix\doi{10.1145/2897356.2897362}.
+%Type = Misc
+\bibitem[{{snakeyaml}()}]{SNAKE}
+\bibinfo{author}{{snakeyaml}}, .
+\newblock \bibinfo{title}{Yaml 1.1 parser and emitter for java}.
+\newblock \URLprefix \url{https://bitbucket.org/asomov/snakeyaml/src/master/}.
+  \bibinfo{note}{accessed: 2021-08-05}.
+
+\end{thebibliography}
