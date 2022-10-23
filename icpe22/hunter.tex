@@ -388,6 +388,7 @@ following command-line: \begin{verbatim}poetry run hunter analyse db-gatling.csv
 The data in db-gatling.csv contains 175 entries and covers 15 months’ worth of data. There are multiple performance changes contained within, both improvements (higher throughput or lower latency) and regressions (lower throughput or higher latency).
 
 \begin{table*}
+\caption{Performance and result accuracy for different significance tests in Hunter's e.divisive implementation.}
 \centering
 \begin{tabular}{|c | c | c | c | c|}
 \hline
@@ -416,40 +417,74 @@ runs, or 50\% of the time.
 \subsection{MongoDB Performance Test Result Dataset}
 
 We also used the publicly available MongoDB Performance Test Result Dataset \cite{MONGODATA} to
-compare the performance of E-divisive means with random permutations, and Student's t-test with and
-without weak change points filtering as the statistical significance test. Since the MongoDB data
-set is so large, we have only included the top 5 tests with the most data points from the legacy
-data set. We also restricted the test data to just the throughput metric for a single thread count
-since the number of data points varied by thread count.
+compare the performance of E-divisive means with random permutations, and Student's t-test with 
+weak change points filtering as the statistical significance test. This is the same data set used in
+\cite{MONGOCPD}, so this analysis should be comparable and familiar to the emerging change point
+detection community.
+
+
+We arbitrarily selected 5 tests from the microbenchmark suite, and only focus on the
+\emph{max\_ops\_per\_sec} result. All results are from task \emph{misc\_read\_commands} and 
+variant \emph{linux-wt-standalone}. The 5 timeseries are shown in Figure 2. To avoid clutter, only one
+timeseries was decorated with the change points found, but the results for the other 4 are similar.
+
+As discussed above, the original E-divisive algorithm is not deterministic. Table 2 shows how many
+change points were found for 100 iterations of each timeseries. The results are alarming. For example
+for \emph{Remove.IntNonIdNoIndex} it finds zero change points 7\% of the time!
+
+Figure 2 also shows the other main issue that we have addressed. When a regresion is quickly followed
+by a fix or rebound, then the original algorithm tends to ignore one or both changes as noise. The
+9th change point in the graph is such an example, it is only found due to the approach with fixed sized
+windows in this work.
+
+Finally we can clearly see that our implementation finds many more change points. This is an expected
+result as most of the modifications are motivated by making the algorithm as sensitive as possible.
+Whether all 16 change points are meaningful is ultimately a subjective judgement, but looking closely
+at the graph one can at least understand why the algorithm would have chosen each point. The implementation
+offers to filter out changes that are too small to be actionable, but this feature was not used in
+these tests, as we wanted to show the full output of our modified E-divisive algorithm, without post
+filtering.
+
+An obvious question we can already anticipate is that if the original implementation from MongoDB
+performs thís poorly, how come MongoDB itself has used it so successfully? The answer is that a
+a higher level in MongoDB's performance CI was designed such that if a point was once flagged as a
+change point, the system will forever remember it. This way change points would not randomly disappear
+while a developer is already working to fix it, and likewise a point marked as a false positive will
+remain muted and not re-appear the next day. But the effect relative to the problems highlighted in
+this paper is that the overall MongoDB CI system will eventually find and remember all change points,
+even if on a given day the E-divisive algorithm may stop early and only return a subset. This higher
+level system was documented in \cite{DSI}.
+
+\begin{figure}
+	\includegraphics[width=0.45\textwidth]{mongodb-microbenchmarks}
+	\caption{5 tests from the public MongoDB microbenchmarks dataset.}
+\end{figure}
 
 \begin{table*}
+\caption{Distribution of nr of change points found with different statistical tests. (MongoDB data set)}
 \centering
-\begin{tabular}{|c | c | c | c|}
+\begin{tabular}{|c | c | c | c|c | c | c | c|c | c | c | c|c | c | c | c|}
 \hline
-Algorithm & Test name & Change points & Change points stddev\\
+Algorithm & Test name & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 12 & 14 & 16 & 18 \\
 \hline
-Permutation & Mixed.FindOneUpdateIntId-50-50 & 742 & 6.611 \\
-Permutation & Mixed.FindThenUpdate-50-50 & 846 & 11.480 \\
-Permutation & Remove.IntId & 587 & 8.905 \\
-Permutation & Remove.IntNonIdIndex & 622 & 8.367\\
-Permutation & Remove.IntNonIdNoIndex & 976 & 20.281 \\
-Student's t-test & Mixed.FindOneUpdateIntId-50-50 & 957 & 0 \\
-Student's t-test & Mixed.FindThenUpdate-50-50 & 1103 & 0 \\
-Student's t-test & Remove.IntId & 810 & 0 \\
-Student's t-test & Remove.IntNonIdIndex & 881 & 0 \\
-Student's t-test & Remove.IntNonIdNoIndex & 1330 & 0 \\
-Student's + Weak Change Points & Mixed.FindOneUpdateIntId-50-50 & 649 & 0 \\
-Student's + Weak Change Points & Mixed.FindThenUpdate-50-50 & 764 & 0 \\
-Student's + Weak Change Points & Remove.IntId & 533 & 0 \\
-Student's + Weak Change Points & Remove.IntNonIdIndex & 549 & 0 \\
-Student's + Weak Change Points & Remove.IntNonIdNoIndex & 654 & 0 \\
+Permutation & Mixed.FindOneUpdateIntId-50-50 & & & & & 1 & & & 1 & & 98 & & & &  \\
+Permutation & Mixed.FindThenUpdate-50-50 & & & & & 1 & & & 99 & & & & & & \\
+Permutation & Remove.IntId & & & & 64 & & 32 & 4 & & & & & & & \\
+Permutation & Remove.IntNonIdIndex & & & & 61 & & 34 & 5 & & & & & & &\\
+Permutation & Remove.IntNonIdNoIndex & 7 & & & 50 & 43 & & & & & & & & & \\
+\hline
+Student's + Weak & Mixed.FindOneUpdateIntId-50-50 & & & & & & & & & & & & & & 100 \\
+Student's + Weak & Mixed.FindThenUpdate-50-50 & & & & & & & & & & & & & 100 & \\
+Student's + Weak & Remove.IntId & & & & & & & & & & & & 100 & &  \\
+Student's + Weak & Remove.IntNonIdIndex & & & & & & & & & & & & 100 & &  \\
+Student's + Weak & Remove.IntNonIdNoIndex & & & & & & & & & & & 100 & & & \\
 \hline
 \end{tabular}
 \end{table*}
 
 
 \section{Lessons Learned}
-We have now been operating Hunter for multiple teams for close to 6 months. In that time we’ve made a number of improvements in addition to the algorithmic changes covered in Section 3. The lessons we have learned, and the changes made in response, helped Hunter to become the de facto choice for statistical significance detection inside of Anonymised Corporation.
+We have now been operating Hunter for multiple teams for close to 2 years. In that time we’ve made a number of improvements in addition to the algorithmic changes covered in Section 3. The lessons we have learned, and the changes made in response, helped Hunter to become the de facto choice for statistical significance detection inside of Anonymised Corporation.
 
 \subsection{More Data Points Are Better}
 We originally started off with 2 weeks worth of data points. Given that performance tests were run once a day this gave us 14 data points. This decision was primarily because we wanted to avoid the delay in collecting lots of data from our graphite server. This proved to be far too few data points to get meaningful results from Hunter and we increased it to a month (around 30) by default. This wider time range has allowed Hunter to deal with noise in the results much better and now we see fewer false positive change points. We plan to experiment with data sets covering a longer period of time in the future to see whether we can reduce the false positive rate even further.
@@ -470,7 +505,7 @@ While Hunter can detect statistically significant changes in time series data, i
 However, the fact that the team was unable to fully take advantage of Hunter motivated them to investigate
 the underlying issue and then migrate their benchmarks and tests to the cloud, which was shown to
 produce more repeatable results than the internal benchmarking lab hardware. After the migration,
-the benchmark results were much more stable and Hunter produced far fewer false positives. Figure 2 shows benchmark data for a single Paxos-based performance test. Before running the test on the public cloud on 2021-09-18 Hunter detected 3 change points per month, on average. All of these were false positives, that is changes in results that were not caused by software or configuration modifications. After the migration Hunter hasn’t detected a single false positive.
+the benchmark results were much more stable and Hunter produced far fewer false positives. Figure 3 shows benchmark data for a single Paxos-based performance test. Before running the test on the public cloud on 2021-09-18 Hunter detected 3 change points per month, on average. All of these were false positives, that is changes in results that were not caused by software or configuration modifications. After the migration Hunter hasn’t detected a single false positive.
 
 \begin{figure}
 	\includegraphics[width=0.45\textwidth]{paxos}
