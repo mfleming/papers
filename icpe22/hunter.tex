@@ -27,6 +27,11 @@
 \usepackage{graphicx}
 \graphicspath{ {./} }
 
+\usepackage[skip=1ex]{caption}
+\usepackage{ragged2e}
+\usepackage{booktabs,tabularx}
+\newcommand\mcc[1]{\multicolumn{2}{c}{#1}}
+
 %% NOTE that a single column version may required for 
 %% submission and peer review. This can be done by changing
 %% the \doucmentclass[...]{acmart} in this template to 
@@ -184,7 +189,7 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-Change point detection has recently gained popularity as a method of detecting performance changes in software due to its ability to cope with noisy data. In this paper we present Hunter, an open-source tool that automatically detects performance regressions and improvements in time-series data. Hunter uses a modified E-divisive means algorithm to identify statistically significant changes in normally-distributed performance metrics. We describe the changes we made to the E-divisive means algorithm along with their motivation. The main change we adopted was to replace the significance test using randomized permutations with a Student's t-test, as we discovered that the randomized approach did not produce deterministic results, at least not with a reasonable number of iterations. In addition we've made tweaks that allow us to find change points the original algorithm would not, such as two nearby changes. Finally, we conclude with lessons we’ve learned supporting Hunter across teams with individual responsibility for the performance of their project.
+Change point detection has recently gained popularity as a method of detecting performance changes in software due to its ability to cope with noisy data. In this paper we present Hunter, an open-source tool that automatically detects performance regressions and improvements in time-series data. Hunter uses a modified E-divisive means algorithm to identify statistically significant changes in normally-distributed performance metrics. We describe the changes we made to the E-divisive means algorithm along with their motivation. The main change we adopted was to replace the significance test using randomized permutations with a Student's t-test, as we discovered that the randomized approach did not produce deterministic results, at least not with a reasonable number of iterations. In addition we've made tweaks that allow us to find change points the original algorithm would not, such as two nearby changes. For evaluation, we developed a method to generate real timeseries, but with artificially injected changes in latency. We used these data sets to compare Hunter against two other well known algorithms, PELT and DYNP. Finally, we conclude with lessons we’ve learned supporting Hunter across teams with individual responsibility for the performance of their project.
 
 \end{abstract}
 
@@ -255,9 +260,11 @@ application-level request scheduling and prioritisation \cite{TALESOFTHETAIL}. A
 job of identifying whether the change in performance is the result of a software change or simply
 noise from the test extremely difficult to do automatically. Threshold-based techniques are covered
 in the literature, but these methods do not handle noise in benchmark data well and require that
-threshold values be set per-test \cite{MONGOCPD}. Additionally, thresholds need to be periodically tuned as performance improvements are added and new baselines are established.
+threshold values be set per-test \cite{MONGOCPD}. Additionally, thresholds need to be periodically 
+tuned as performance improvements are added and new baselines are established.
 
-In the past, we have relied heavily on experienced engineers to visually inspect graphs and benchmark data to identify changes in performance. However, this suffers from a number of drawbacks including:
+In the past, we have relied heavily on experienced engineers to visually inspect graphs and benchmark
+data to identify changes in performance. However, this suffers from a number of drawbacks including:
 
 \begin{itemize}
 \item Expert knowledge for identifying changes is difficult to teach other engineers
@@ -274,6 +281,8 @@ The contributions in this paper are:
 \begin{itemize}
 \item We present an open-source tool that can run change point detection on any time-series data containing multiple metrics in either a .CSV file or stored on a graphite server.
 \item We discuss the modifications we have made to the E-divisive means algorithm to improve its performance and predictability of results.
+\item We develop a method for generating timeseries of real benchmarking results, with artificially injected changes to latency at discrete points in time. This allows us to evaluate the accuracy of an algorithm objectively, against a known set of correct change points.
+\item We compare Hunter (modified E-divisive means) against two other change point detection algorithms, DYNP and PELT.
 \item We share the lessons that we have learned from running Hunter in a multi-team environment where each team is responsible for a different product and favors different benchmarks.
 \end{itemize}
 
@@ -453,7 +462,7 @@ while a developer is already working to fix it, and likewise a point marked as a
 remain muted and not re-appear the next day. But the effect relative to the problems highlighted in
 this paper is that the overall MongoDB CI system will eventually find and remember all change points,
 even if on a given day the E-divisive algorithm may stop early and only return a subset. This higher
-level system was documented in \cite{DSI}.
+level system was documented in \cite{DSI} and the recorded change points are also part of \cite{MONGODATA}.
 
 \begin{figure}
 	\includegraphics[width=0.45\textwidth]{mongodb-microbenchmarks}
@@ -482,6 +491,167 @@ Student's + Weak & Remove.IntNonIdNoIndex & & & & & & & & & & & 100 & & & \\
 \end{tabular}
 \end{table*}
 
+\subsection{Evaluation with a Dataset with Known Change Points}
+
+One weakness in the above analysis, and to our knowledge all previous literature published on this
+topic so far, is that judging the accuracy of the algorithm or its implementation is always subjective.
+Ultimately it's the human evaluator who decides whether a reported change point is a true positive,
+or "useful", or "actionable". And note that those may not be the same! This is because an objective
+truth about the correct set of change points is not available. If we had that knowledge, we would
+not have needed this system to begin with.
+
+It's of course possible to generate synthetic timeseries with changes injected at known steps, such
+as a sine wave or even white noise, where the mean or amplitude is changing at discrete points.
+However these tests tend to feel naive and E-divisive performs quite well against them.
+
+To obtain a real data set, one captured from benchmarking Anonymised Database with the same toolchain
+used for CI\cite{FALLOUT}, we employed Chaos Mesh\cite{CHAOS} to artificially generate network latency in the system
+under test. In other words we artificially injected real changes, at known points in time, into a real
+benchmark producing otherwise realistic results.
+
+In order to create different time series, we decided on a group of variables that we varied to
+generate varying scenarios. We created 9 different scenarios by altering the values of the following
+variables: number of changepoints, magnitude of change of variance between groups, magnitude of change
+between groups and the length of groups. A group is defined as the set of points occurring between
+two changepoints. Each scenario contains 5 test series, each with a minor variation. The scenarios
+themselves can be grouped into three categories. The first scenario, change in mean, creates change
+points by changing the mean of the groups. The variance remains relative constant. Similarly,
+change in variance has constant mean and varying variance. This case is great to replicate noisy
+environment's. Change in both mean and variance realistically replicates noisy environment's with random
+latencies. 
+
+Note that the timeseries used for this evaluation is different from those in previous sections.
+Whereas previous timeseries have been a sequence of (nightly) builds, and the data points represent
+values like average throughput during a test, in this evaluation the timeseries is from a single
+benchmark, and the values are snapshots each second. This is because waiting for a year to create a
+time series of true nightly builds was not practical.
+
+\subsubsection{Evaluation Metrics}
+
+Having obtained data sets with known change points, we can now employ objective statistical tests
+to measure the accuracy of Hunter. Essentially we have recast the evaluation task as a machine
+learning problem, where an algorithm is expected to produce a known output from a given input training
+dataset.
+
+We will evaluate hunter using two metrics, F1 score and Rand Index. In particular we will be
+evaluating the \textbf{p99} metric. p99 indicates that 1 in every 100 users will encounter latency.
+It is a common industry standard and also used for performance targets when developing Anonymised
+Database.
+ .
+
+\subsubsection{True Positives}
+We will be using the following two variables to represent the sets of ground truth and predicted points:
+
+$$X^{*}: \text{set of ground truth}$$
+$$X : \text{set of predicted points}$$
+
+True positives are defined as the set of change-points in the detected class that are real change points i.e they are present in the set.
+\textit{M} represents the scope of error. If the difference between the predicted points and the true changepoint in less that or equal to \textit{M} we will consider it as a correcty predicted changepoint.
+$$TP(X , X^*) := \{x \in X | \exists  x^* \in X^*  s.t. |x- x^* | \leq M\}$$
+
+It was important to ensure that there were no duplication's ie. if two points in the predicted set were in the margin of error of the same point in $X^{*}$. A  changepoint in $X^{*}$ was marked as \textit{visited} once a point in $X$ was within $M$ and added to $TP(X,X^{*})$ set and can not be considered again. 
+
+\subsubsection{F1 Score}
+The reasons for using the F1 Score to calculate the accuracy of hunter are that it is unaffected by the size and the density of data, it penalizes false positives and credits correct detections.
+
+F1 score is defined as
+
+$$F1 =2* \frac{precision * recall}{precision + recall}$$
+
+Precision is the proportion of predicted change points that are true change points:($https://arxiv.org/pdf/1801.00718.pdf$)
+$$Precision  = \frac{|TP(X,X^*)|}{|X|^*}$$ 
+
+Recall is the proportion of true change points that are well predicted:($https://arxiv.org/pdf/1801.00718.pdf$)
+
+$$Recall = \frac{|TP(X,X^*)|}{|X|}$$
+
+\subsubsection{Rand Index}
+
+Another metric we evaluated on was the rand index. 
+
+$$RandIndex(X,X^*) = \frac{ TP + TN}{TP + TN+ FP+ FN}$$
+
+\begin{itemize}
+    \item \textbf{TP} : correctly predicts the positive class : True change points calculated
+    \item \textbf{TN} : correctly predicts the negative class :  None in this case
+    \item \textbf{FP} :  model incorrectly predicts positive class : $|X^*| - |TP(X,X^*)|$
+    \item \textbf{FN} :model incorrectly predicts negative class: $|X| - |TP(X,X^*)|$
+\end{itemize}
+
+\subsubsection{Benchmarking against PELT and DYNP}
+
+With an objective truth to benchmark against, it also becomes possible to compare Hunter against alternative change point detection algorithms. We therefore also present results from two other well-known offline algorithms PELT and DYNP. These algorithms were used using the ruptures package in python.\cite{SELECTREVIEW}
+
+\subsubsection{Results}
+We ran hunter over 45 test runs. The test runs were ran on a GKE cluster using Kubernetes. The cluster was ran on 4 x \textit{n2-standard-4} nodes in zone \textit{us-central1-a}. 
+
+All the algorithms were evaluated on two metrics. It can be seen that hunter has consistently outperformed both \textit{pelt} and \textit{dynp} on both the metrics. In all the experiments we had an margin of error as \textbf{10 seconds}.
+
+\begin{figure}[b]
+	\includegraphics[width=0.45\textwidth]{bar-graph.png}
+	\caption{Correlation between F1 and number of points }\label{Figure 1}
+\end{figure}
+
+\subsubsection{Correlation to the number of points}
+
+There is a positive correlation between the number of points and accuracy. As the number of points increase so does hunter's performance. For Figure 3 it can be seen that hunter outperformed both PELT and DYNP with a huge margine.
+
+\subsubsection{Correlation between delta error and algorithms}
+Hunter's performance increases if we allow a larger margin of error. Hunter is able to get an \textit{F1 score} of \textbf{0.1481} with an delta error of one second, where PELT and DYNP need a margin of error of at least 3 seconds to get a non-zero score. This is a key characteristic why E-divisive has served us well for detecting regressions in CI. Preferably we like to know the exact commit that caused a regression, not just the general area whereabouts a regression is suspected. E-divisive is superior in satisfying especially this requirement! The performance of all algorithms increases drastically as we give them slightly more flexibility in terms of margin of error. With a margin of error of 4 seconds we see that the performance increases to \textit{0.612} for Hunter. DYNP starts to catch up with Hunters accuracy at 15 seconds.
+
+\begin{figure}[H]
+	\includegraphics[width=0.45\textwidth]{line-graph.png}
+	\caption{Correlation between F1 and number of points }
+\end{figure}
+
+
+
+\begin{table*}[!ht]
+\caption{Evaluation results}
+\centering
+\begin{tabularx}{\textwidth}{
+>{\hsize=0.4\hsize\bfseries\RaggedRight}X
+*{6}{>{\hsize=0.1\hsize\centering\arraybackslash}X}}
+    \toprule
+
+\textbf{Algorithm}
+    & \mcc{\textit{Hunter}} & \mcc{\textit{Pelt}} & \mcc{\textit{Dynp}} \\
+    \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}%
+Metric     & $F1$ & $Rand$ & $F1$ & $Rand$ & $F1$ & $Rand$ \\
+    \midrule
+\multicolumn{7}{c}{\textbf{Single Change Point}} \\
+    \midrule
+ Scenario1   & 0.261904 & 0.166667 & 0.0 & 0.0 & 0.0 & 0.0 \\
+    \addlinespace%
+Scenario2    & 0.466667 & 0.305556 & 0.027027 & 0.013698 & 0.285714 & 0.166667\\
+    \addlinespace%
+Scenario 3    & 0.466667 & 0.305556 & 0.040556 & 0.020698 & 0.285714 & 0.166667 \\
+    \addlinespace
+    \midrule
+\multicolumn{7}{c}{\textbf{Two Change Points}} \\ \midrule[0.3pt]
+
+ Scenario4   & 0.666667 & 0.666667 & 0.060606 & 0.031746 & 0.190476 & 0.111112 \\
+    \addlinespace
+ Scenario5   & 0.888889 & 0.833334 & 0.090909 & 0.047619 & 0.095238 & 0.055556 \\
+    \addlinespace
+ Scenario6   & 0.490476 & 0.327777 & 0.0 & 0.0 & 0.0 & 0.0 \\
+    \addlinespace
+\midrule
+\multicolumn{7}{c}{\textbf{Four Change Points}} \\ \midrule[0.3pt]
+
+ Scenario7   & 0.925926 & 0.866667 & 0.249999 & 0.142857 & 0.444445 & 0.285714 \\
+    \addlinespace
+ Scenario8   & 0.731313 & 0.579365 & 0.085713 & 0.045073 & 0.095238 & 0.055556 \\
+    \addlinespace
+ Scenario9   & 0.818182 & 0.714286 & 0.016460 & 0.00843 & 0.0 & 0.0 \\
+    \addlinespace
+    \bottomrule
+\end{tabularx}
+\end{table*}
+
+
+
+
 
 \section{Lessons Learned}
 We have now been operating Hunter for multiple teams for close to 2 years. In that time we’ve made a number of improvements in addition to the algorithmic changes covered in Section 3. The lessons we have learned, and the changes made in response, helped Hunter to become the de facto choice for statistical significance detection inside of Anonymised Corporation.
@@ -505,7 +675,7 @@ While Hunter can detect statistically significant changes in time series data, i
 However, the fact that the team was unable to fully take advantage of Hunter motivated them to investigate
 the underlying issue and then migrate their benchmarks and tests to the cloud, which was shown to
 produce more repeatable results than the internal benchmarking lab hardware. After the migration,
-the benchmark results were much more stable and Hunter produced far fewer false positives. Figure 3 shows benchmark data for a single Paxos-based performance test. Before running the test on the public cloud on 2021-09-18 Hunter detected 3 change points per month, on average. All of these were false positives, that is changes in results that were not caused by software or configuration modifications. After the migration Hunter hasn’t detected a single false positive.
+the benchmark results were much more stable and Hunter produced far fewer false positives. Figure 5 shows benchmark data for a single Paxos-based performance test. Before running the test on the public cloud on 2021-09-18 Hunter detected 3 change points per month, on average. All of these were false positives, that is changes in results that were not caused by software or configuration modifications. After the migration Hunter hasn’t detected a single false positive.
 
 \begin{figure}
 	\includegraphics[width=0.45\textwidth]{paxos}
@@ -530,7 +700,7 @@ Detecting performance regressions across a range of product versions requires au
 Hunter is an open source tool that uses change point detection to automatically identify changes in
 time-series data, taken from either a graphite server or CSV file, and report the presence of change
 points. Hunter extends the E-divisive Means algorithm to incorporate a Student's t-test which
-removes the indeterminism present in the original version and provides reproducible results every time it is run on a single data series. We also introduced a sliding window technique to detect change points that are temporally close to each other.
+removes the indeterminism present in the original version and provides reproducible results every time it is run on a single data series. We also introduced a sliding window technique to detect change points that are temporally close to each other. In addition to outperforming the original E-divisive means implementation, Hunter seems to also outperform two other well known algorithms, PELT and DYNP.
 
 \section{Acknowledgments}
 We are grateful to Guy Bolton King for his contributions to Hunter.
