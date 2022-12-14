@@ -1,0 +1,71 @@
+// This was used to extract a single timeseries from the MongoDB performance testing data set.
+// Note that this $match still is missing the `project` field. As a result, our analysis is
+// a concatenation of MongoDB master and two stable branches. Corresponding to
+// performance: {$in : ["performance", "performance-4.0", "performance-4.2"]}}
+// Luckily we ordered by `order` field, so the different timeseries are concatenated.
+// Had we ordered by `create_time`, the 3 different series would have been interleaved.
+
+test_name='Remove.IntNonIdNoIndex';
+db.points.aggregate(
+   [
+   {'$match': {test: test_name, task: 'misc_read_commands',variant:'linux-wt-standalone'}},
+   {'$project': 
+      {max_ops_per_sec: '$max_ops_per_sec',
+       order:'$order',
+       create_time: '$create_time',
+       test: '$test'
+      }
+   },
+   {'$out' : test_name}
+]).pretty()
+
+
+
+// The csv files fed into Hunter were then created with:
+
+    mongoexport --db=perf --collection='Mixed.FindOneUpdateIntId-50-50'  --type=csv --fields=test,order,create_time,max_ops_per_sec --sort={order:1} > csv/Mixed.FindOneUpdateIntId-50-50.csv
+
+
+
+
+// Run vanilla e-divisive 100 times in a loop
+
+    for i in {1..100}; do hunter analyze --orig-edivisive foo Mixed.FindOneUpdateIntId-50-50.csv | grep %| wc -l;done > csv/Mixed.FindOneUpdateIntId-50-50.loop
+
+
+
+
+
+
+// And this is the "analytics job"
+
+$ cat csv/Remove.IntNonIdNoIndex.loop | sort | uniq -c
+      7 0
+     50 3
+     43 4
+$ cat csv/Remove.IntNonIdIndex.loop | sort | uniq -c
+     61 3
+     33 5
+      5 6
+$ cat csv/Remove.IntNonIdIndex.loop | sort | uniq -c
+     61 3
+     34 5
+      5 6
+$ cat csv/Remove.IntId.loop | sort | uniq -c
+     11 3
+      5 5
+$ cat csv/Remove.IntId.loop | sort | uniq -c
+     34 3
+     13 5
+      2 6
+$ cat csv/Remove.IntId.loop | sort | uniq -c
+     64 3
+     32 5
+      4 6
+$ cat csv/Mixed.FindThenUpdate-50-50.loop | sort | uniq -c
+      1 4
+     99 7
+$ cat csv/Mixed.FindOneUpdateIntId-50-50.loop | sort | uniq -c
+      1 4
+      1 7
+     98 9
