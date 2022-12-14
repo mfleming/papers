@@ -22,7 +22,7 @@
 %% in the same archive or directory.)
 %%
 %% The first command in your LaTeX source must be the \documentclass command.
-\documentclass[sigconf,authordraft]{acmart}
+\documentclass[sigconf]{acmart}
 
 \usepackage{graphicx}
 \graphicspath{ {./} }
@@ -57,14 +57,13 @@
 %% values in them; it is your responsibility as an author to replace
 %% the commands and values with those provided to you when you
 %% complete the rights form.
-%\setcopyright{acmcopyright}
-%\copyrightyear{2018}
-%\acmYear{2018}
-%\acmDOI{10.1145/1122445.1122456}
+\setcopyright{acmcopyright}
+\copyrightyear{2023}
+\acmYear{2023}
+\acmDOI{10.1145/1122445.1122456}
 %
 %%% These commands are for a PROCEEDINGS abstract or paper.
-%\acmConference[Woodstock '18]{Woodstock '18: ACM Symposium on Neural
-%  Gaze Detection}{June 03--05, 2018}{Woodstock, NY}
+\acmConference[ICPE2023]{ICPE 2023: International Conference on Performance Engineering}{April 15-19, 2023}{Coimbra, Portugal}
 %\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
 %  June 03--05, 2018, Woodstock, NY}
 %\acmPrice{15.00}
@@ -177,19 +176,69 @@
 %  \country{USA}}
 %\email{jpkumquat@consortium.net}
 
+\author{Matt Fleming}
+\email{matt@codeblueprint.co.uk}
+\authornote{DataStax, Inc}
+\affiliation{%
+  \institution{~}
+}
+
+\author{Piotr Kołaczkowski}
+\email{pkolaczk@datastax.com}
+\authornotemark[1]
+\affiliation{%
+  \institution{~}
+}
+
+\author{Ishita Kumar}
+\email{ishitakumar@umass.edu}
+\authornotemark[1]
+\affiliation{%
+  \institution{~}
+}
+
+\author{Shaunak Das}
+\email{shaunak.das@datastax.com}
+\authornotemark[1]
+\affiliation{%
+  \institution{~}
+}
+
+\author{Sean McCarthy}
+\email{sean.mccarthy@datastax.com}
+\authornotemark[1]
+\affiliation{%
+  \institution{~}
+}
+
+\author{Pushkala Pattabhiraman}
+\email{Pushkala.Pattabhiraman@datastax.com}
+\authornotemark[1]
+\affiliation{%
+  \institution{~}
+}
+
+\author{Henrik Ingo}
+\email{henrik.ingo@avoinelama.fi}
+\authornotemark[1]
+\affiliation{%
+  \institution{~}
+}
+
+
 %%
 %% By default, the full list of authors will be used in the page
 %% headers. Often, this list is too long, and will overlap
 %% other information printed in the page headers. This command allows
 %% the author to define a more concise list
 %% of authors' names for this purpose.
-\renewcommand{\shortauthors}{Trovato and Tobin, et al.}
+\renewcommand{\shortauthors}{Fleming and Kołaczkowski, et al.}
 
 %%
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-Change point detection has recently gained popularity as a method of detecting performance changes in software due to its ability to cope with noisy data. In this paper we present Hunter, an open-source tool that automatically detects performance regressions and improvements in time-series data. Hunter uses a modified E-divisive means algorithm to identify statistically significant changes in normally-distributed performance metrics. We describe the changes we made to the E-divisive means algorithm along with their motivation. The main change we adopted was to replace the significance test using randomized permutations with a Student's t-test, as we discovered that the randomized approach did not produce deterministic results, at least not with a reasonable number of iterations. In addition we've made tweaks that allow us to find change points the original algorithm would not, such as two nearby changes. For evaluation, we developed a method to generate real timeseries, but with artificially injected changes in latency. We used these data sets to compare Hunter against two other well known algorithms, PELT and DYNP. Finally, we conclude with lessons we’ve learned supporting Hunter across teams with individual responsibility for the performance of their project.
+Change point detection has recently gained popularity as a method of detecting performance changes in software due to its ability to cope with noisy data. In this paper we present Hunter, an open source tool that automatically detects performance regressions and improvements in time-series data. Hunter uses a modified E-divisive means algorithm to identify statistically significant changes in normally-distributed performance metrics. We describe the changes we made to the E-divisive means algorithm along with their motivation. The main change we adopted was to replace the significance test using randomized permutations with a Student's t-test, as we discovered that the randomized approach did not produce deterministic results, at least not with a reasonable number of iterations. In addition we've made tweaks that allow us to find change points the original algorithm would not, such as two nearby changes. For evaluation, we developed a method to generate real timeseries, but with artificially injected changes in latency. We used these data sets to compare Hunter against two other well known algorithms, PELT and DYNP. Finally, we conclude with lessons we’ve learned supporting Hunter across teams with individual responsibility for the performance of their project.
 
 \end{abstract}
 
@@ -272,7 +321,7 @@ data to identify changes in performance. However, this suffers from a number of 
 \item Even experienced engineers can miss changes
 \end{itemize}
 
-Because of these drawbacks, we have recently created Hunter, an open-source tool that uses change point detection to find statistically significant changes in time-series data. Change point detection has recently gained favour as a method of coping with the inherent instability, or noise, in performance test and benchmark data \cite{MONGOCPD} and can identify both performance regressions and improvements.
+Because of these drawbacks, we have recently created Hunter\cite{HUNTER}, an open source tool that uses change point detection to find statistically significant changes in time-series data. Change point detection has recently gained favour as a method of coping with the inherent instability, or noise, in performance test and benchmark data \cite{MONGOCPD} and can identify both performance regressions and improvements.
 
 Hunter was designed with the goal of eliminating the need for a dedicated group of engineers to sift through performance test results. Instead, individual teams can feed their benchmark data to a central datastore which Hunter pulls from and analyses. We use Hunter for validating multiple releases across various distributed database and streaming products which has required that we make Hunter intuitive and user-friendly for engineers that are experts in their particular area but not performance experts.
 
@@ -295,8 +344,8 @@ Hunter can run analysis on data pulled from a graphite server or from data conta
 \subsection{Configuration}
 The data sources that Hunter uses are specified in a YAML configuration file. This configuration file has sections for graphite servers, Slack tokens, and data definitions. Hunter even supports templating which allows common definitions to be reused and avoids test definition duplication. Since we routinely use Hunter on hundreds of tests and metrics, the template feature helps to keep our configuration file small. For example, we use graphite metric prefixes to group related metrics together so that all metrics for a specific Apache Cassandra version are linked by a common string.
 
-One example of this is the test db.20k-rw-ts.fixed, a benchmark running on (Anonymised Enterprise
-Database) that performs read and write operations at a fixed rate of throughput. We run this test in both
+One example of this is the test db.20k-rw-ts.fixed, a benchmark running on Datastax Enterprise
+that performs read and write operations at a fixed rate of throughput. We run this test in both
 a configuration with replication factor 1 and with replication factor 3 and yet despite this
 difference we can reuse around 95\% of the Hunter configuration because the metric types are the same.
 
@@ -390,9 +439,9 @@ Additionally, we filter out change points that show a small relative change, e.g
 where the difference in metric value is below 5\%. This relative threshold acts as a filter to discard change points that are not actionable, i.e. change points that are too small for developers to reproduce or verify a fix.
 
 \section{Evaluation}
-We evaluated our algorithms using benchmark data taken from a daily Gatling \cite{GATLING} performance test on (Anonymised
-Enterprise Database). The benchmark data was saved to a CSV file and passed to Hunter using the
-following command-line: \begin{verbatim}poetry run hunter analyse db-gatling.csv\end{verbatim}. Table Y shows the runtime for running Hunter on the benchmark data. 
+We evaluated our algorithms using benchmark data taken from a daily Gatling \cite{GATLING} performance test on Datastax Enterprise.
+The benchmark data was saved to a CSV file and passed to Hunter using the
+following command-line: \begin{verbatim}poetry run hunter analyse db-gatling.csv\end{verbatim}.
 
 The data in db-gatling.csv contains 175 entries and covers 15 months’ worth of data. There are multiple performance changes contained within, both improvements (higher throughput or lower latency) and regressions (lower throughput or higher latency).
 
@@ -412,12 +461,12 @@ Student's + Weak Change Points & 1.594 & 1.584, 1.603 & 16 & 0 \\
 
 We opted for reading the data from a CSV file to avoid network communication delays with the
 graphite server influencing the duration of each run. Every algorithm was run 30 times on the same
-CSV file and the mean value, along with 95\% confidence intervals,are reported in Table Y.
+CSV file and the mean value, along with 95\% confidence intervals, are reported in Table 1.
 
-Since we found that the permutation algorithm produced unstable results, we have also included the average number of change points detected for each of the algorithms in Table Y as well as the standard deviations.
+Since we found that the permutation algorithm produced unstable results, we have also included the average number of change points detected for each of the algorithms in Table 1 as well as the standard deviations.
 
 \subsection{Quickly Reverted Regressions}
-Around 2020-10-10 on the graph in Figure 1 we can see a drop in the throughput. This performance regression was caused by a change to the way network packet decoding and processing was done in (Anonymised Enterprise DB). This problematic change was reverted on 2020-10-21 which explains why the throughput metric returns to previous values shortly after. Two red lines demarcate the data range where the regression is present. This is a known problem with change point detection and is explicitly mentioned in \cite{MONGOCPD}.
+Around 2020-10-10 on the graph in Figure 1 we can see a drop in the throughput. This performance regression was caused by a change to the way network packet decoding and processing was done in Datastax Enterprise. This problematic change was reverted on 2020-10-21 which explains why the throughput metric returns to previous values shortly after. Two red lines demarcate the data range where the regression is present. This is a known problem with change point detection and is explicitly mentioned in \cite{MONGOCPD}.
 
 Both the Student's t-test and weak change points algorithms detected this regression and revert in each of the 30
 runs through the data. The permutation based algorithm, only detected these changes for 15 of the 30
@@ -439,14 +488,16 @@ timeseries was decorated with the change points found, but the results for the o
 
 As discussed above, the original E-divisive algorithm is not deterministic. Table 2 shows how many
 change points were found for 100 iterations of each timeseries. The results are alarming. For example
-for \emph{Remove.IntNonIdNoIndex} it finds zero change points 7\% of the time!
+for \emph{Remove.IntNonIdNoIndex} (row 5) it finds 4 change points 43\% of the time, 3 points 50\%
+of the time, but 7\% of the time it finds zero change points!
 
 Figure 2 also shows the other main issue that we have addressed. When a regresion is quickly followed
 by a fix or rebound, then the original algorithm tends to ignore one or both changes as noise. The
 9th change point in the graph is such an example, it is only found due to the approach with fixed sized
 windows in this work.
 
-Finally we can clearly see that our implementation finds many more change points. This is an expected
+Finally we can clearly see that our implementation finds many more change points. (The red diamonds
+are found only with the Student's t-test configuration.) This is an expected
 result as most of the modifications are motivated by making the algorithm as sensitive as possible.
 Whether all 16 change points are meaningful is ultimately a subjective judgement, but looking closely
 at the graph one can at least understand why the algorithm would have chosen each point. The implementation
@@ -470,7 +521,7 @@ level system was documented in \cite{DSI} and the recorded change points are als
 \end{figure}
 
 \begin{table*}
-\caption{Distribution of nr of change points found with different statistical tests. (MongoDB data set)}
+\caption{Distribution of nr of change points found with different statistical tests. (MongoDB data set, 100 iterations)}
 \centering
 \begin{tabular}{|c | c | c | c|c | c | c | c|c | c | c | c|c | c | c | c|}
 \hline
@@ -504,10 +555,10 @@ It's of course possible to generate synthetic timeseries with changes injected a
 as a sine wave or even white noise, where the mean or amplitude is changing at discrete points.
 However these tests tend to feel naive and E-divisive performs quite well against them.
 
-To obtain a real data set, one captured from benchmarking Anonymised Database with the same toolchain
-used for CI\cite{FALLOUT}, we employed Chaos Mesh\cite{CHAOS} to artificially generate network latency in the system
+To obtain a real data set, we employed Chaos Mesh\cite{CHAOS} to artificially generate network latency in the system
 under test. In other words we artificially injected real changes, at known points in time, into a real
-benchmark producing otherwise realistic results.
+benchmark producing otherwise realistic results. The benchmark used was to test Cassandra with the 
+same toolchain used for CI\cite{FALLOUT}.
 
 In order to create different time series, we decided on a group of variables that we varied to
 generate varying scenarios. We created 9 different scenarios by altering the values of the following
@@ -535,9 +586,7 @@ dataset.
 
 We will evaluate hunter using two metrics, F1 score and Rand Index. In particular we will be
 evaluating the \textbf{p99} metric. p99 indicates that 1 in every 100 users will encounter latency.
-It is a common industry standard and also used for performance targets when developing Anonymised
-Database.
- .
+It is a common industry standard and also used for performance targets when developing Cassandra.
 
 \subsubsection{True Positives}
 We will be using the following two variables to represent the sets of ground truth and predicted points:
@@ -558,10 +607,10 @@ F1 score is defined as
 
 $$F1 =2* \frac{precision * recall}{precision + recall}$$
 
-Precision is the proportion of predicted change points that are true change points:($https://arxiv.org/pdf/1801.00718.pdf$)
+Precision is the proportion of predicted change points that are true change points:\cite{SELECTREVIEW}
 $$Precision  = \frac{|TP(X,X^*)|}{|X|^*}$$ 
 
-Recall is the proportion of true change points that are well predicted:($https://arxiv.org/pdf/1801.00718.pdf$)
+Recall is the proportion of true change points that are well predicted:\cite{SELECTREVIEW}
 
 $$Recall = \frac{|TP(X,X^*)|}{|X|}$$
 
@@ -601,7 +650,7 @@ Hunter's performance increases if we allow a larger margin of error. Hunter is a
 
 \begin{figure}[H]
 	\includegraphics[width=0.45\textwidth]{line-graph.png}
-	\caption{Correlation between F1 and number of points }
+	\caption{Correlation between F1 and delta error }
 \end{figure}
 
 
@@ -625,7 +674,7 @@ Metric     & $F1$ & $Rand$ & $F1$ & $Rand$ & $F1$ & $Rand$ \\
     \addlinespace%
 Scenario2    & 0.466667 & 0.305556 & 0.027027 & 0.013698 & 0.285714 & 0.166667\\
     \addlinespace%
-Scenario 3    & 0.466667 & 0.305556 & 0.040556 & 0.020698 & 0.285714 & 0.166667 \\
+Scenario3    & 0.466667 & 0.305556 & 0.040556 & 0.020698 & 0.285714 & 0.166667 \\
     \addlinespace
     \midrule
 \multicolumn{7}{c}{\textbf{Two Change Points}} \\ \midrule[0.3pt]
@@ -654,7 +703,7 @@ Scenario 3    & 0.466667 & 0.305556 & 0.040556 & 0.020698 & 0.285714 & 0.166667 
 
 
 \section{Lessons Learned}
-We have now been operating Hunter for multiple teams for close to 2 years. In that time we’ve made a number of improvements in addition to the algorithmic changes covered in Section 3. The lessons we have learned, and the changes made in response, helped Hunter to become the de facto choice for statistical significance detection inside of Anonymised Corporation.
+We have now been operating Hunter for multiple teams for close to 2 years. In that time we’ve made a number of improvements in addition to the algorithmic changes covered in Section 3. The lessons we have learned, and the changes made in response, helped Hunter to become the de facto choice for statistical significance detection inside of DataStax.
 
 \subsection{More Data Points Are Better}
 We originally started off with 2 weeks worth of data points. Given that performance tests were run once a day this gave us 14 data points. This decision was primarily because we wanted to avoid the delay in collecting lots of data from our graphite server. This proved to be far too few data points to get meaningful results from Hunter and we increased it to a month (around 30) by default. This wider time range has allowed Hunter to deal with noise in the results much better and now we see fewer false positive change points. We plan to experiment with data sets covering a longer period of time in the future to see whether we can reduce the false positive rate even further.
@@ -697,7 +746,7 @@ Running performance tests in the cloud is known to be susceptible to performance
 \section{Conclusion}
 Detecting performance regressions across a range of product versions requires automation to be able to identify them quickly and without needing expert developers to manually detect them. Change point detection has emerged as a solution to this problem because of its ability to cope with noise in the data that is inherent to performance testing.
 
-Hunter is an open source tool that uses change point detection to automatically identify changes in
+Hunter is an open source\cite{HUNTER} tool that uses change point detection to automatically identify changes in
 time-series data, taken from either a graphite server or CSV file, and report the presence of change
 points. Hunter extends the E-divisive Means algorithm to incorporate a Student's t-test which
 removes the indeterminism present in the original version and provides reproducible results every time it is run on a single data series. We also introduced a sliding window technique to detect change points that are temporally close to each other. In addition to outperforming the original E-divisive means implementation, Hunter seems to also outperform two other well known algorithms, PELT and DYNP.
