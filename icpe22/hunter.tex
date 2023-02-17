@@ -57,18 +57,32 @@
 %% values in them; it is your responsibility as an author to replace
 %% the commands and values with those provided to you when you
 %% complete the rights form.
-\setcopyright{acmcopyright}
-\copyrightyear{2023}
-\acmYear{2023}
-\acmDOI{10.1145/1122445.1122456}
+%\setcopyright{acmcopyright}
+%\copyrightyear{2023}
+%\acmYear{2023}
+%\acmDOI{10.1145/1122445.1122456}
 %
 %%% These commands are for a PROCEEDINGS abstract or paper.
-\acmConference[ICPE2023]{ICPE 2023: International Conference on Performance Engineering}{April 15-19, 2023}{Coimbra, Portugal}
+%\acmConference[ICPE2023]{ICPE 2023: International Conference on Performance Engineering}{April 15-19, 2023}{Coimbra, Portugal}
 %\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
 %  June 03--05, 2018, Woodstock, NY}
 %\acmPrice{15.00}
 %\acmISBN{978-1-4503-XXXX-X/18/06}
 %
+
+\copyrightyear{2023}
+\acmYear{2023}
+\setcopyright{rightsretained}
+\acmConference[ICPE '23] {Proceedings of the 2023 ACM/SPEC International Conference on Performance Engineering}{April 15--19, 2023}{Coimbra, Portugal.}
+\acmBooktitle{Proceedings of the 2023 ACM/SPEC International Conference on Performance Engineering (ICPE '23), April 15--19, 2023, Coimbra, Portugal}
+\acmPrice{}
+\acmISBN{979-8-4007-0068-2/23/04}
+\acmDOI{10.1145/3578244.3583719}
+% Authors, replace the red X's with your assigned DOI string during the rightsreview eform process.
+%% Your DOI link will become active when the proceedings appears in the DL.
+
+\settopmatter{printacmref=true}
+
 %
 %%
 %% Submission ID.
@@ -178,51 +192,51 @@
 
 \author{Matt Fleming}
 \email{matt@codeblueprint.co.uk}
-\authornote{DataStax, Inc}
 \affiliation{%
-  \institution{~}
+  \institution{DataStax, Inc}
+  \orcid{0000-0002-0738-2350}
 }
 
 \author{Piotr Kołaczkowski}
 \email{pkolaczk@datastax.com}
-\authornotemark[1]
 \affiliation{%
-  \institution{~}
+  \institution{DataStax, Inc}
+  \orcid{0000-0002-1645-9911}
 }
 
 \author{Ishita Kumar}
 \email{ishitakumar@umass.edu}
-\authornotemark[1]
 \affiliation{%
-  \institution{~}
+  \institution{DataStax, Inc}
+  \orcid{0000-0002-2429-3317}
 }
 
 \author{Shaunak Das}
 \email{shaunak.das@datastax.com}
-\authornotemark[1]
 \affiliation{%
-  \institution{~}
+  \institution{DataStax, Inc}
+  \orcid{0000-0002-1002-0721}
 }
 
 \author{Sean McCarthy}
 \email{sean.mccarthy@datastax.com}
-\authornotemark[1]
 \affiliation{%
-  \institution{~}
+  \institution{DataStax, Inc}
+  \orcid{0000-0003-3862-6597}
 }
 
 \author{Pushkala Pattabhiraman}
 \email{Pushkala.Pattabhiraman@datastax.com}
-\authornotemark[1]
 \affiliation{%
-  \institution{~}
+  \institution{DataStax, Inc}
+  \orcid{0000-0002-3724-782X}
 }
 
 \author{Henrik Ingo}
 \email{henrik.ingo@avoinelama.fi}
-\authornotemark[1]
 \affiliation{%
-  \institution{~}
+  \institution{DataStax, Inc}
+  \orcid{0000-0003-1571-5108}
 }
 
 
@@ -506,7 +520,7 @@ these tests, as we wanted to show the full output of our modified E-divisive alg
 filtering.
 
 An obvious question we can already anticipate is that if the original implementation from MongoDB
-performs thís poorly, how come MongoDB itself has used it so successfully? The answer is that a
+performs this poorly, how come MongoDB itself has used it so successfully? The answer is that
 a higher level in MongoDB's performance CI was designed such that if a point was once flagged as a
 change point, the system will forever remember it. This way change points would not randomly disappear
 while a developer is already working to fix it, and likewise a point marked as a false positive will
@@ -598,7 +612,7 @@ True positives are defined as the set of change-points in the detected class tha
 \textit{M} represents the scope of error. If the difference between the predicted points and the true changepoint in less that or equal to \textit{M} we will consider it as a correcty predicted changepoint.
 $$TP(X , X^*) := \{x \in X | \exists  x^* \in X^*  s.t. |x- x^* | \leq M\}$$
 
-It was important to ensure that there were no duplication's ie. if two points in the predicted set were in the margin of error of the same point in $X^{*}$. A  changepoint in $X^{*}$ was marked as \textit{visited} once a point in $X$ was within $M$ and added to $TP(X,X^{*})$ set and can not be considered again. 
+It was important to ensure that there were no duplications ie. if two points in the predicted set were in the margin of error of the same point in $X^{*}$. A  changepoint in $X^{*}$ was marked as \textit{visited} once a point in $X$ was within $M$ and added to $TP(X,X^{*})$ set and can not be considered again. 
 
 \subsubsection{F1 Score}
 The reasons for using the F1 Score to calculate the accuracy of hunter are that it is unaffected by the size and the density of data, it penalizes false positives and credits correct detections.
@@ -755,6 +769,7 @@ removes the indeterminism present in the original version and provides reproduci
 We are grateful to Guy Bolton King for his contributions to Hunter.
 
 \bibliographystyle{ACM-Reference-Format}
+\balance
 \bibliography{hunter}
 
 \end{document}
